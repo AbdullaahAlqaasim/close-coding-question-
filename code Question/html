@@ -1,0 +1,225 @@
+<div id="root">
+  <div id="selected-items"></div>
+</div>
+
+<style>
+.List__item--teal {
+    background-color: #39cccc;
+    }
+    
+    .List__item--olive {
+    background-color: #3d9970;
+    }
+    
+    .List__item--green {
+    background-color: #2ecc40;
+    }
+    
+    .List__item--lime {
+    background-color: #01ff70;
+    }
+    
+    .List__item--yellow {
+    background-color: #ffdc00;
+    }
+    
+    .List__item--orange {
+    background-color: #ff851b;
+    }
+    
+    .List__item--red {
+    background-color: #ff4136;
+    }
+    
+    .List__item--maroon {
+    background-color: #85144b;
+    }
+    
+    .List__item--fuchsia {
+    background-color: #f012be;
+    }
+    
+    .List__item--purple {
+    background-color: #b10dc9;
+    }
+    
+    .List__item--black {
+    background-color: #111111;
+    }
+    
+    .List__item--gray {
+    background-color: #aaaaaa;
+    }
+    
+    .List__item--silver {
+    background-color: #dddddd;
+    }
+    
+    .List__item--selected {
+    background-color: #e6e6e6;
+    color: #333333;
+    }
+    
+    .ReactMultiSelect {
+    margin-bottom: 16px;
+    }
+    
+    .ReactMultiSelect__selected {
+    display: flex;
+    flex-wrap: wrap;
+    }
+    
+    .ReactMultiSelect__selected__item {
+    margin-right: 8px;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background-color: #0074d9;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+    
+    .ReactMultiSelect__selected__item:hover {
+    background-color: #0063ad;
+    }
+
+</style>
+
+
+    
+const { Fragment, useState, useMemo } = React;
+
+const List = ({ items, onSelect }) => {
+  // Create a memoized array of selected item names
+  const selectedNames = useMemo(() => {
+    return items.filter((item) => item.selected).map((item) => item.name);
+  }, [items]);
+
+  return (
+    <Fragment>
+      <div>
+        {selectedNames.length > 0 && (
+          <p>
+            Selected items: {selectedNames.join(", ")}
+          </p>
+        )}
+      </div>
+      <ul className="List">
+        {items.map((item) => (
+          <ListItem
+            key={item.name}
+            item={item}
+            onSelect={onSelect}
+          />
+        ))}
+      </ul>
+    </Fragment>
+  );
+};
+
+const ListItem = React.memo(({ item, onSelect }) => {
+  const handleSelect = () => {
+    onSelect(item.name);
+  };
+
+  return (
+    <li
+      className={`List__item List__item--${item.color} ${
+        item.selected ? "List__item--selected" : ""
+      }`}
+      onClick={handleSelect}
+    >
+      {item.name}
+    </li>
+  );
+});
+
+// ---------------------------------------
+// Do NOT change anything below this line.
+// ---------------------------------------
+
+const sizes = ["tiny", "small", "medium", "large", "huge"];
+const colors = [
+  "navy",
+  "blue",
+  "aqua",
+  "teal",
+  "olive",
+  "green",
+  "lime",
+  "yellow",
+  "orange",
+  "red",
+  "maroon",
+  "fuchsia",
+  "purple",
+  "silver",
+  "gray",
+  "black",
+];
+const fruits = [
+  "apple",
+  "banana",
+  "watermelon",
+  "orange",
+  "peach",
+  "tangerine",
+  "pear",
+  "kiwi",
+  "mango",
+  "pineapple",
+];
+
+const items = sizes.reduce(
+  (items, size) => [
+    ...items,
+    ...fruits.reduce(
+      (acc, fruit) => [
+        ...acc,
+        ...colors.map((color) => ({
+          name: `${size} ${color} ${fruit}`,
+          color,
+          selected: false,
+        })),
+      ],
+      []
+    ),
+  ],
+  []
+);
+
+const App = () => {
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const handleSelect = (itemName) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(itemName)) {
+        // If the item is already selected, unselect it
+        return prevSelectedItems.filter((name) => name !== itemName);
+      } else {
+        // If the item is not selected, add it to the selected items
+        return [...prevSelectedItems, itemName];
+      }
+    });
+  };
+
+  // Memoize the items with the updated selection status
+  const memoizedItems = useMemo(() => {
+    return items.map((item) => ({
+      ...item,
+      selected: selectedItems.includes(item.name),
+    }));
+  }, [items, selectedItems]);
+
+  return (
+    <div>
+      <h1>List of Items</h1>
+      <List items={memoizedItems} onSelect={handleSelect} />
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+   
+    
